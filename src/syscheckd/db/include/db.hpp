@@ -49,6 +49,8 @@ extern "C" {
 #define FIMDB_RM_MAX_LOOP 10 // Max number of loop iterations
 #define FIMDB_RM_DEFAULT_TIME 100 //miliseconds
 
+#define FIMBD_FILE_TABLE_NAME "file_entry"
+
 #define FIM_LAST_ROW 0
 #define FIM_FIRST_ROW 1
 
@@ -479,21 +481,18 @@ char** fim_db_get_paths_from_inode(fdb_t* fim_sql, unsigned long int inode, unsi
 /**
  * @brief Delete entry from the DB using file path.
  *
- * @param fim_sql FIM database struct.
  * @param path Path of the entry to be removed.
  *
  * @return FIMDB_OK on success, FIMDB_ERR otherwise.
  */
-int fim_db_remove_path(fdb_t* fim_sql, const char* path);
+int fim_db_remove_path(const char* path);
 
 /**
  * @brief Set all entries from database to unscanned.
  *
- * @param fim_sql FIM database struct.
- *
  * @return FIMDB_OK on success, FIMDB_ERR otherwise.
  */
-int fim_db_set_all_unscanned(fdb_t* fim_sql);
+int fim_db_set_all_unscanned();
 
 /**
  * @brief Get all the unscanned files by saving them in a temporal storage.
