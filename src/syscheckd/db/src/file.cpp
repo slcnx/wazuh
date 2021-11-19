@@ -5,11 +5,12 @@
  *
  * @copyright Copyright (C) 2015-2021 Wazuh, Inc.
  */
+#include "db.hpp"
+#include "json.hpp"
+#include "fimDBHelper.hpp"
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "db.hpp"
 
 #ifdef WAZUH_UNIT_TESTING
 /* Remove static qualifier when unit testing */
@@ -110,9 +111,9 @@ char** fim_db_get_paths_from_inode(fdb_t* fim_sql, unsigned long int inode, unsi
 int fim_db_remove_path(const char* path)
 {
     int state = FIMDB_ERR;
-    // nlohmann::json removeFile;
-    // removeFile["path"] = path;
-    // FIMDBHelper::removeFromDB(FIMBD_FILE_TABLE_NAME, removeFile);
+    nlohmann::json removeFile;
+    removeFile["path"] = path;
+    FIMDBHelper::removeFromDB<FIMDB>(FIMBD_FILE_TABLE_NAME, removeFile);
 
     return state;
 }
