@@ -50,6 +50,31 @@ namespace FIMDBHelper
                               handler_RSync);
     }
 #endif
+    /**
+    * @brief Convert a DBSync error to a FIM error
+    *
+    * @param error a int with a FIM error
+    *
+    * @return 0 on success, another value otherwise.
+    */
+    template<typename T>
+    int queryError(const T & error)
+    {
+        switch (error)
+        {
+            case SUCCESS:
+                return 0;
+                break;
+            case MAX_ROWS_ERROR:
+                return -2;
+                break;
+            case DBSYNC_ERROR:
+                return -1;
+                break;
+        }
+
+        return SUCCESS;
+    }
 
     /**
     * @brief Delete a row from a table
@@ -60,7 +85,7 @@ namespace FIMDBHelper
     * @return 0 on success, another value otherwise.
     */
     template<typename T>
-    int removeFromDB(const std::string& tableName, const nlohmann::json& filter)
+    int removeFromDB(const std::string & tableName, const nlohmann::json & filter)
     {
         const auto deleteJsonStatement = R"({
                                                 "table": "",
@@ -75,7 +100,7 @@ namespace FIMDBHelper
         deleteJson["table"] = tableName;
         deleteJson["query"]["data"] = {filter};
 
-        return T::getInstance().removeItem(deleteJson);
+        return queryError(T::getInstance().removeItem(deleteJson));
     }
     /**
     * @brief Get count of all entries in a table
@@ -107,7 +132,8 @@ namespace FIMDBHelper
                 }
             }
         };
-        return T::getInstance().executeQuery(countQuery, callback);
+
+        return queryError(T::getInstance().executeQuery(countQuery, callback));
     }
 
     /**
@@ -134,7 +160,7 @@ namespace FIMDBHelper
         insert["table"] = tableName;
         insert["data"] = {item};
 
-        return T::getInstance().insertItem(insert);
+        return queryError(T::getInstance().insertItem(insert));
     }
 
     /**
@@ -175,7 +201,7 @@ namespace FIMDBHelper
             return static_cast<int>(dbQueryResult::DBSYNC_ERROR);
         }
 
-        return T::getInstance().updateItem(update, callback);
+        return queryError(T::getInstance().updateItem(update, callback));
     }
 
     /**
@@ -199,7 +225,7 @@ namespace FIMDBHelper
             }
         };
 
-        return T::getInstance().executeQuery(query, callback);
+        return queryError(T::getInstance().executeQuery(query, callback));
     }
 }
 

@@ -69,7 +69,7 @@ void fim_generate_delete_event(fdb_t *fim_sql,
 
     // Remove path from the DB.
     w_mutex_lock(mutex);
-    if (fim_db_remove_path(fim_sql, entry->file_entry.path) == FIMDB_ERR) {
+    if (fim_db_remove_path(entry->file_entry.path) == FIMDB_ERR) {
         w_mutex_unlock(mutex);
         return;
     }
@@ -147,8 +147,6 @@ time_t fim_scan() {
     w_mutex_lock(&syscheck.fim_scan_mutex);
 
     update_wildcards_config();
-
-    fim_db_set_all_unscanned(syscheck.database);
 
     w_rwlock_rdlock(&syscheck.directories_lock);
     OSList_foreach(node_it, syscheck.directories) {

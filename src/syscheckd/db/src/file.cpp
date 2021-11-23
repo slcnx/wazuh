@@ -5,8 +5,8 @@
  *
  * @copyright Copyright (C) 2015-2021 Wazuh, Inc.
  */
-#include "db.hpp"
 #include "json.hpp"
+#include "db.hpp"
 #include "fimDBHelper.hpp"
 #ifdef __cplusplus
 extern "C" {
@@ -23,16 +23,9 @@ extern void mock_assert(const int result, const char* const expression, const ch
 #endif
 
 extern const char* SQL_STMT[];
-
-/**
- * @brief Set file entry scanned.
- *
- * @param fim_sql FIM database struct.
- * @param path File path.
- *
- * @return FIMDB_OK on success, FIMDB_ERR otherwise.
- */
-static int fim_db_set_scanned(fdb_t* fim_sql, const char* path);
+const auto fileColumnList = R"({"column_list":"[path, mode, last_event, scanned, options, checksum, dev, inode, size,
+                                                perm, attributes, uid, gid, user_name, group_name, hash_md5, hash_sha1,
+                                                hash_sha256, mtime]"})"_json;
 
 int fim_db_get_not_scanned(fdb_t* fim_sql, fim_tmp_file** file, int storage)
 {
@@ -44,14 +37,14 @@ int fim_db_get_not_scanned(fdb_t* fim_sql, fim_tmp_file** file, int storage)
     return ret;
 }
 
-// LCOV_EXCL_START
+// LCOV_EXCL_START eliminar
 int fim_db_delete_not_scanned(fdb_t* fim_sql, fim_tmp_file* file, pthread_mutex_t* mutex, int storage)
 {
     /* TODO: Add c++ code to delete files unscanned from DB
     */
     return FIMDB_OK;
 }
-
+//eliminar
 int fim_db_delete_range(fdb_t* fim_sql,
                         fim_tmp_file* file,
                         pthread_mutex_t* mutex,
@@ -63,7 +56,7 @@ int fim_db_delete_range(fdb_t* fim_sql,
     */
     return FIMDB_OK;
 }
-
+//eliminar
 int fim_db_process_missing_entry(fdb_t* fim_sql,
                                  fim_tmp_file* file,
                                  pthread_mutex_t* mutex,
@@ -74,7 +67,7 @@ int fim_db_process_missing_entry(fdb_t* fim_sql,
     */
     return FIMDB_OK;
 }
-
+//eliminar
 int fim_db_remove_wildcard_entry(fdb_t* fim_sql,
                                  fim_tmp_file* file,
                                  pthread_mutex_t* mutex,
@@ -91,11 +84,11 @@ int fim_db_remove_wildcard_entry(fdb_t* fim_sql,
 fim_entry* fim_db_get_path(fdb_t* fim_sql, const char* file_path)
 {
     fim_entry* entry = NULL;
+    auto filter = std::string("WHERE path=") + std::string(file_path);
+    auto entry_from_path = FIMDBHelper::dbQuery(FIMBD_FILE_TABLE_NAME, fileColumnList, filter, "path");
+    std::unique_ptr<FileItem> file(new FileItem(entry_from_path));
 
-    /* TODO: Add c++ code to manage this function 
-    */
-
-    return entry;
+    return file->toFimEntry();
 }
 
 char** fim_db_get_paths_from_inode(fdb_t* fim_sql, unsigned long int inode, unsigned long int dev)
@@ -110,29 +103,12 @@ char** fim_db_get_paths_from_inode(fdb_t* fim_sql, unsigned long int inode, unsi
 
 int fim_db_remove_path(const char* path)
 {
-    int state = FIMDB_ERR;
     nlohmann::json removeFile;
     removeFile["path"] = path;
-    FIMDBHelper::removeFromDB<FIMDB>(FIMBD_FILE_TABLE_NAME, removeFile);
 
-    return state;
+    return FIMDBHelper::removeFromDB<FIMDB>(FIMBD_FILE_TABLE_NAME, removeFile);
 }
 
-int fim_db_set_all_unscanned()
-{
-    int retval;
-    /* TODO: Add c++ code to implement set all unscanned in DB 
-    */
-    return retval;
-}
-
-int fim_db_set_scanned(fdb_t* fim_sql, const char* path)
-{
-    /* TODO: Add c++ code to implement set scanned in DB 
-    */
-
-    return FIMDB_OK;
-}
 
 int fim_db_get_count_file_inode(fdb_t* fim_sql)
 {

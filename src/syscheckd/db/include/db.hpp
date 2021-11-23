@@ -16,11 +16,11 @@ extern "C" {
 
 #define fim_db_decode_registry_value_full_row(stmt) _fim_db_decode_registry_value(stmt, 11)
 
-#include "shared.h"
 #include <openssl/evp.h>
 #include "syscheck.h"
 #include "external/sqlite/sqlite3.h"
 #include "config/syscheck-config.h"
+#include "dbFileItem.hpp"
 #ifdef WIN32
 #include "registry/registry.h"
 #endif
